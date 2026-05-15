@@ -1,0 +1,532 @@
+{
+  "users": [
+    {
+      "id": "user-demo",
+      "name": "Demo Learner",
+      "email": "demo@growthos.local",
+      "passwordHash": "51459c23ca91ebce271449dd8b5c26751c99039c2ae4c628067898ca0e104039",
+      "activeGoalId": "01371488-ebc4-4b7a-91c8-1e7a5a4471d9",
+      "streak": 0,
+      "level": 7,
+      "weakAreas": [
+        "Deep work consistency",
+        "Revision follow-through",
+        "Portfolio publishing"
+      ],
+      "sessions": [
+        "6ee9a27f-bc59-4849-8c6c-c709525d9724",
+        "e2e1814c-8cf1-4e86-a7c1-b15e9ea7a283",
+        "cbba2216-b05f-411b-a13f-56bf79d2d182",
+        "de8f9ab1-0ba5-4b13-a5b3-cb6182eda915",
+        "0fb43913-5cae-4922-8dd8-42225b3a5582",
+        "cc6f9d74-e8b1-4b69-b492-07a386c6d1d1",
+        "e02c8b62-3bf6-4e66-821b-1d7b8f0c7dc5",
+        "090a319c-05de-4dd6-898a-8b1c656df0c5",
+        "85665a4a-b1c9-48e7-bf6d-98d37cf83d02",
+        "6b05fa1e-eb28-4235-8e96-048d8512b02b",
+        "255e4ef9-39f6-4d28-bcdc-9f5dc7905527"
+      ],
+      "goals": [
+        {
+          "id": "01371488-ebc4-4b7a-91c8-1e7a5a4471d9",
+          "title": "Become a job-ready full-stack engineer",
+          "domain": "ai-ml",
+          "targetDate": "2026-08-31",
+          "hoursPerDay": 2.5,
+          "performanceScore": 62,
+          "status": "active"
+        },
+        {
+          "id": "goal-1",
+          "title": "Become a job-ready full-stack engineer",
+          "domain": "engineering",
+          "targetDate": "2026-08-31",
+          "hoursPerDay": 2.5,
+          "performanceScore": 74,
+          "status": "active"
+        },
+        {
+          "id": "goal-2",
+          "title": "Build a public content system for career visibility",
+          "domain": "content-creation",
+          "targetDate": "2026-07-15",
+          "hoursPerDay": 1,
+          "performanceScore": 68,
+          "status": "paused"
+        }
+      ],
+      "assets": [
+        {
+          "id": "asset-1",
+          "title": "AI project assistant",
+          "type": "project",
+          "link": "https://github.com/example/ai-project-assistant",
+          "summary": "Portfolio project proving full-stack execution and API integration.",
+          "createdAt": "2026-05-01"
+        },
+        {
+          "id": "asset-2",
+          "title": "System design notes",
+          "type": "note",
+          "link": "https://www.notion.so/",
+          "summary": "Revision notebook for backend and scaling concepts.",
+          "createdAt": "2026-05-06"
+        },
+        {
+          "id": "asset-3",
+          "title": "Frontend certification",
+          "type": "certificate",
+          "link": "https://www.coursera.org/",
+          "summary": "Certificate added as proof of structured learning progress.",
+          "createdAt": "2026-04-21"
+        }
+      ],
+      "reminders": [
+        {
+          "id": "reminder-1",
+          "text": "Revise yesterday's topic before starting new material.",
+          "dueLabel": "Today",
+          "completed": false
+        },
+        {
+          "id": "reminder-2",
+          "text": "Upload one project proof or certificate this week.",
+          "dueLabel": "This week",
+          "completed": false
+        },
+        {
+          "id": "reminder-3",
+          "text": "Complete one practice session before 8 PM today.",
+          "dueLabel": "8:00 PM",
+          "completed": false
+        },
+        {
+          "id": "reminder-4",
+          "text": "Review weak areas during your Sunday reflection block.",
+          "dueLabel": "Sunday",
+          "completed": false
+        }
+      ],
+      "activity": [
+        {
+          "id": "activity-1",
+          "date": "2026-05-07",
+          "consistency": 68,
+          "productivity": 64,
+          "completedTopics": 12
+        },
+        {
+          "id": "activity-2",
+          "date": "2026-05-08",
+          "consistency": 72,
+          "productivity": 67,
+          "completedTopics": 13
+        },
+        {
+          "id": "activity-3",
+          "date": "2026-05-09",
+          "consistency": 76,
+          "productivity": 70,
+          "completedTopics": 14
+        },
+        {
+          "id": "activity-4",
+          "date": "2026-05-10",
+          "consistency": 79,
+          "productivity": 72,
+          "completedTopics": 16
+        },
+        {
+          "id": "activity-5",
+          "date": "2026-05-11",
+          "consistency": 81,
+          "productivity": 74,
+          "completedTopics": 17
+        },
+        {
+          "id": "activity-6",
+          "date": "2026-05-12",
+          "consistency": 84,
+          "productivity": 76,
+          "completedTopics": 18
+        }
+      ],
+      "achievements": [
+        {
+          "id": "achievement-1",
+          "title": "21-Day Streak",
+          "detail": "Consistency badge unlocked",
+          "unlockedAt": "2026-05-07"
+        },
+        {
+          "id": "achievement-2",
+          "title": "Builder Level 7",
+          "detail": "Two portfolio artifacts published",
+          "unlockedAt": "2026-05-08"
+        },
+        {
+          "id": "achievement-3",
+          "title": "Recovery Loop",
+          "detail": "Weak-area revision completed twice",
+          "unlockedAt": "2026-05-09"
+        }
+      ],
+      "chatMessages": [
+        {
+          "id": "chat-bootstrap",
+          "role": "assistant",
+          "content": "Ask me any learning or career question. I can help with study plans, projects, exams, and next steps.",
+          "createdAt": "2026-05-13T06:52:06.713Z"
+        },
+        {
+          "id": "31e3fe88-2c6a-463c-88df-6615d84f51d3",
+          "role": "user",
+          "content": "How do I start learning system design?",
+          "createdAt": "2026-05-14T09:01:23.951Z",
+          "mode": "study-help"
+        },
+        {
+          "id": "46f0fed7-79ce-47a8-8ec0-79f6f10c9cb8",
+          "role": "assistant",
+          "content": "Break the topic into concept, practice, and review. In Software Engineering, momentum improves when each study block ends with a tangible output. (study help)",
+          "createdAt": "2026-05-14T09:01:23.955Z",
+          "mode": "study-help"
+        },
+        {
+          "id": "2c128483-98a1-41c0-983b-d644fe180669",
+          "role": "user",
+          "content": "How do I start learning system design?",
+          "createdAt": "2026-05-14T09:03:21.171Z",
+          "mode": "study-help"
+        },
+        {
+          "id": "90f834ee-157d-4f0c-a7b3-7e73154648dc",
+          "role": "assistant",
+          "content": "Break the topic into concept, practice, and review. In Software Engineering, momentum improves when each study block ends with a tangible output. (study help)",
+          "createdAt": "2026-05-14T09:03:21.174Z",
+          "mode": "study-help"
+        }
+      ],
+      "chatConversations": [
+        {
+          "id": "8fdae7f2-c57b-478e-b50b-0276f51465cd",
+          "title": "How do I start learning system design?",
+          "domain": "engineering",
+          "createdAt": "2026-05-13T11:30:57.563Z",
+          "updatedAt": "2026-05-14T09:03:21.174Z",
+          "messages": [
+            {
+              "id": "chat-bootstrap",
+              "role": "assistant",
+              "content": "Ask me any learning or career question. I can help with study plans, projects, exams, and next steps.",
+              "createdAt": "2026-05-13T06:52:06.713Z"
+            },
+            {
+              "id": "31e3fe88-2c6a-463c-88df-6615d84f51d3",
+              "role": "user",
+              "content": "How do I start learning system design?",
+              "createdAt": "2026-05-14T09:01:23.951Z",
+              "mode": "study-help"
+            },
+            {
+              "id": "46f0fed7-79ce-47a8-8ec0-79f6f10c9cb8",
+              "role": "assistant",
+              "content": "Break the topic into concept, practice, and review. In Software Engineering, momentum improves when each study block ends with a tangible output. (study help)",
+              "createdAt": "2026-05-14T09:01:23.955Z",
+              "mode": "study-help"
+            },
+            {
+              "id": "2c128483-98a1-41c0-983b-d644fe180669",
+              "role": "user",
+              "content": "How do I start learning system design?",
+              "createdAt": "2026-05-14T09:03:21.171Z",
+              "mode": "study-help"
+            },
+            {
+              "id": "90f834ee-157d-4f0c-a7b3-7e73154648dc",
+              "role": "assistant",
+              "content": "Break the topic into concept, practice, and review. In Software Engineering, momentum improves when each study block ends with a tangible output. (study help)",
+              "createdAt": "2026-05-14T09:03:21.174Z",
+              "mode": "study-help"
+            }
+          ]
+        }
+      ],
+      "activeChatId": "8fdae7f2-c57b-478e-b50b-0276f51465cd"
+    },
+    {
+      "id": "27dfab73-6af9-438d-92e0-158cba9aec28",
+      "name": "Pranya Patel",
+      "email": "pranyapatel18@gmail.com",
+      "passwordHash": "fc5e0a9f40856035366555b50dd7d5fe6298f661d9801b54aaf4dafa7f0e3cba",
+      "activeGoalId": "97acbe6d-1353-40b6-94bb-4b9dd89a1de5",
+      "streak": 2,
+      "level": 4,
+      "weakAreas": [
+        "No data yet. Start logging practice and reviews."
+      ],
+      "sessions": [
+        "05f202a5-ba16-438f-8158-59802bb99f22",
+        "0d219b93-bbd6-4499-b436-ccea791c83e0",
+        "6a7124c4-0974-43b1-9191-fb8de5fa282c",
+        "167f2f07-921e-4c1a-8083-345f54296caf",
+        "858b1b16-ff03-48ce-9718-7a780ad46cb2",
+        "f03835ba-b6f5-4f57-8229-2600a4a6c64d",
+        "7585ef14-4831-40b4-bb46-6d4c94e43c62",
+        "4081fada-0ae2-4667-aff1-d4bef96036db",
+        "41fc42e5-b847-416b-8de8-6aac69587946",
+        "7bc8826c-a4cb-4880-b447-3df5abb45a07",
+        "c4cd7828-88cc-44ca-be08-57537d439052",
+        "b9cada3b-3ecc-4ba8-a6ec-1d23470629f1",
+        "4d57edf8-616d-4509-a8aa-f078b9e75c9a",
+        "6dd9b0a0-5092-48f0-ad03-efd1f75ca562",
+        "de2c3d5e-8c65-4e09-904e-1171a931919d",
+        "38cb314b-4e53-47fd-89a6-01990e61de24",
+        "87d5f4a3-e552-4137-a54e-3e32a6bab645",
+        "a33e9c2e-2d77-4c95-ad39-8050704d0fd9",
+        "eadae619-7270-4f02-929a-877a1769d8a4",
+        "68e99b5a-e613-4857-8f1e-14523c5255c1",
+        "4b0e4d32-9763-49ab-b29e-775b64957112",
+        "dc88ee2e-84ae-4120-8c21-a37cb5f19956",
+        "eda19afb-dddf-4cad-941a-f2ff14855fa7",
+        "cbd5761c-5ab3-46d2-a6be-dc3fa2375a41",
+        "6814ca9e-4e8b-4bc9-a591-8daf58918af1",
+        "ab4f26d7-d111-46e3-bca7-55b2e503107e",
+        "3699778d-095e-4c06-9a60-6ba54b7429cb",
+        "aa8e65e2-cc96-4c5a-8af5-932b9cf70b01",
+        "b904e372-a860-4cc5-be4e-10ff0fdae22a",
+        "990fcef6-30fb-423d-b794-1750b1dcab70",
+        "85d3e345-8e6b-4c19-a79c-f815d4934e89",
+        "338bd148-14ce-4c12-b48f-d9b3e08b90de",
+        "3ee9deae-dc95-40fb-abe3-40ed91c0c872",
+        "9012a824-115c-44e8-9802-79699e50ea3d",
+        "01bc564d-97eb-4051-8436-416d7a39c1d4",
+        "3490efac-9ba7-48d3-b027-561db2e8fc98",
+        "d4308243-0ed1-4ad0-83fc-03f3eabb8b93",
+        "bcd5ec18-a7f2-449b-a369-6f60cc35d504",
+        "49b243c8-fa9d-4c73-9715-70e9220eae33",
+        "f0ff4347-d856-4519-83b8-03b164a4a241"
+      ],
+      "goals": [
+        {
+          "id": "97acbe6d-1353-40b6-94bb-4b9dd89a1de5",
+          "title": "New goal",
+          "domain": "data-security",
+          "targetDate": "2026-09-30",
+          "hoursPerDay": 2,
+          "performanceScore": 70,
+          "status": "active"
+        },
+        {
+          "id": "199fc8fa-7eb2-43a3-96e2-4edf314a3231",
+          "title": "New goal",
+          "domain": "ai-ml",
+          "targetDate": "2026-09-30",
+          "hoursPerDay": 2,
+          "performanceScore": 70,
+          "status": "paused"
+        }
+      ],
+      "assets": [],
+      "reminders": [
+        {
+          "id": "reminder-1",
+          "text": "Create your first roadmap and schedule your first study block.",
+          "dueLabel": "Today",
+          "completed": true
+        }
+      ],
+      "activity": [
+        {
+          "id": "activity-1",
+          "date": "2026-05-13",
+          "consistency": 50,
+          "productivity": 50,
+          "completedTopics": 0
+        },
+        {
+          "id": "6e5013e1-e8e9-4fb9-852b-5a64720d5cf5",
+          "date": "2026-05-13",
+          "consistency": 53,
+          "productivity": 52,
+          "completedTopics": 1
+        },
+        {
+          "id": "3fe0af9f-68b5-4b2f-af8d-2ea7e4835ec6",
+          "date": "2026-05-13",
+          "consistency": 56,
+          "productivity": 54,
+          "completedTopics": 2
+        },
+        {
+          "id": "5f4b0692-f3b9-4364-b204-32da8f3bb4cd",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "e9a17813-1c00-48a4-b8f3-686a839aea97",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "91eda8af-c231-4ee7-b4cb-0f21785d7249",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "8d65387f-9364-4b07-8505-1fbea08f722d",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "e53a8681-6c00-4277-863e-c5c9a80e4dfb",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "60b21a9d-833f-49b6-a8cd-37d674274360",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "a2ad42fa-92a2-449e-ab07-a192d90137d4",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "3130e9bc-4b25-4e01-8c2a-c70960f931e4",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "ee43f8e1-9212-4fbe-9760-6ce8d85b127f",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        },
+        {
+          "id": "60b4825d-66d3-4462-94b1-6a19c974ac9f",
+          "date": "2026-05-14",
+          "consistency": 95,
+          "productivity": 80,
+          "completedTopics": 15
+        }
+      ],
+      "achievements": [],
+      "chatMessages": [
+        {
+          "id": "947bcac3-40a1-43c9-90d5-24f7bc75c2a4",
+          "role": "assistant",
+          "content": "History cleared. Start a new conversation whenever you are ready.",
+          "createdAt": "2026-05-14T16:52:56.621Z"
+        }
+      ],
+      "chatConversations": [
+        {
+          "id": "07f829af-866c-4ae5-8c8c-19f3570d8973",
+          "title": "New chat",
+          "domain": "ai-ml",
+          "createdAt": "2026-05-14T16:52:56.621Z",
+          "updatedAt": "2026-05-14T16:52:56.621Z",
+          "messages": [
+            {
+              "id": "947bcac3-40a1-43c9-90d5-24f7bc75c2a4",
+              "role": "assistant",
+              "content": "History cleared. Start a new conversation whenever you are ready.",
+              "createdAt": "2026-05-14T16:52:56.621Z"
+            }
+          ]
+        }
+      ],
+      "activeChatId": "07f829af-866c-4ae5-8c8c-19f3570d8973"
+    },
+    {
+      "id": "bc035aea-17ba-4f9a-8269-1c746a9cb117",
+      "name": "Pranya",
+      "email": "pranyapatel18@gamil.com",
+      "passwordHash": "fc5e0a9f40856035366555b50dd7d5fe6298f661d9801b54aaf4dafa7f0e3cba",
+      "activeGoalId": "goal-1",
+      "streak": 0,
+      "level": 1,
+      "weakAreas": [
+        "No data yet. Start logging practice and reviews."
+      ],
+      "sessions": [
+        "9a467c13-0d9f-4649-89be-714da72e3c68"
+      ],
+      "goals": [
+        {
+          "id": "goal-1",
+          "title": "Define your first serious growth goal",
+          "domain": "engineering",
+          "targetDate": "2026-08-31",
+          "hoursPerDay": 2,
+          "performanceScore": 60,
+          "status": "active"
+        }
+      ],
+      "assets": [],
+      "reminders": [
+        {
+          "id": "reminder-1",
+          "text": "Create your first roadmap and schedule your first study block.",
+          "dueLabel": "Today",
+          "completed": false
+        }
+      ],
+      "activity": [
+        {
+          "id": "activity-1",
+          "date": "2026-05-14",
+          "consistency": 50,
+          "productivity": 50,
+          "completedTopics": 0
+        }
+      ],
+      "achievements": [],
+      "chatMessages": [
+        {
+          "id": "chat-1",
+          "role": "assistant",
+          "content": "Welcome. Ask your first query and I will help you with concepts, planning, and career direction.",
+          "createdAt": "2026-05-14T12:17:04.439Z"
+        }
+      ],
+      "chatConversations": [
+        {
+          "id": "6904a765-18b7-4874-a42f-e440582fbf0c",
+          "title": "Getting started",
+          "domain": "engineering",
+          "createdAt": "2026-05-14T12:17:04.439Z",
+          "updatedAt": "2026-05-14T12:17:04.439Z",
+          "messages": [
+            {
+              "id": "chat-1",
+              "role": "assistant",
+              "content": "Welcome. Ask your first query and I will help you with concepts, planning, and career direction.",
+              "createdAt": "2026-05-14T12:17:04.439Z"
+            }
+          ]
+        }
+      ],
+      "activeChatId": "6904a765-18b7-4874-a42f-e440582fbf0c"
+    }
+  ]
+}

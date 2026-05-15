@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Growth OS</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Arial, sans-serif;
+        background: #f7fbff;
+        color: #0f172a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top, rgba(56, 189, 248, 0.22), transparent 32%),
+          linear-gradient(180deg, #f7fbff 0%, #eef7ff 100%);
+      }
+
+      main {
+        width: min(92vw, 520px);
+        padding: 32px 24px;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 32px;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Growth OS</h1>
+      <p>
+        The native shell is ready. Start the Next.js server or point <code>MOBILE_APP_URL</code> at your deployed app,
+        then sync the Capacitor projects for Android and iOS.
+      </p>
+    </main>
+  </body>
+</html>
