@@ -1,8 +1,11 @@
 "use client";
 
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toClientErrorMessage } from "@/lib/client-errors";
+import { firebaseAuth, isFirebaseConfigured } from "@/lib/firebase";
+import { ensureFirestoreUser } from "@/lib/firebase-user";
 
 const featureCards = [
   {
@@ -35,36 +38,59 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  useEffect(() => {
+    if (!firebaseAuth || !isFirebaseConfigured()) {
+      return;
+    }
+
+    return onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        router.replace("/dashboard");
+      }
+    });
+  }, [router]);
+
+  async function authenticate() {
     setError("");
+    const cleanEmail = email.trim();
+    const cleanName = name.trim();
+
+    if (!cleanEmail || !password) {
+      setError("Enter your email and password.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const response = await fetch(`/api/auth/${mode}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password
-        })
-      });
-
-      if (!response.ok) {
-        const data = (await response.json()) as { error?: string };
-        setError(data.error ?? "Authentication failed.");
+      if (!firebaseAuth || !isFirebaseConfigured()) {
+        setError("Firebase is not configured. Add NEXT_PUBLIC_FIREBASE_* values.");
         return;
       }
 
-      router.push("/dashboard");
+      if (mode === "login") {
+        const credentials = await signInWithEmailAndPassword(firebaseAuth, cleanEmail, password);
+        await ensureFirestoreUser(credentials.user);
+      } else {
+        const credentials = await createUserWithEmailAndPassword(firebaseAuth, cleanEmail, password);
+        if (cleanName) {
+          await updateProfile(credentials.user, { displayName: cleanName });
+        }
+        await ensureFirestoreUser(credentials.user);
+      }
+
+      router.replace("/dashboard");
       router.refresh();
+      window.location.assign("/dashboard");
     } catch (error) {
       setError(toClientErrorMessage(error, "Authentication failed."));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await authenticate();
   }
 
   return (
@@ -148,6 +174,9 @@ export default function AuthPage() {
           <form onSubmit={submit} className="mt-8 space-y-4">
             {mode === "register" ? (
               <input
+                type="text"
+                autoComplete="name"
+                required
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Your name"
@@ -155,6 +184,9 @@ export default function AuthPage() {
               />
             ) : null}
             <input
+              type="email"
+              autoComplete="email"
+              required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Email"
@@ -163,6 +195,9 @@ export default function AuthPage() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                required
+                minLength={6}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="Password"

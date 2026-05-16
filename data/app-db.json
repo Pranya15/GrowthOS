@@ -259,7 +259,7 @@
       "name": "Pranya Patel",
       "email": "pranyapatel18@gmail.com",
       "passwordHash": "fc5e0a9f40856035366555b50dd7d5fe6298f661d9801b54aaf4dafa7f0e3cba",
-      "activeGoalId": "97acbe6d-1353-40b6-94bb-4b9dd89a1de5",
+      "activeGoalId": "8b65b13d-03d4-423d-a71e-2bfc1166b72d",
       "streak": 2,
       "level": 4,
       "weakAreas": [
@@ -305,26 +305,19 @@
         "d4308243-0ed1-4ad0-83fc-03f3eabb8b93",
         "bcd5ec18-a7f2-449b-a369-6f60cc35d504",
         "49b243c8-fa9d-4c73-9715-70e9220eae33",
-        "f0ff4347-d856-4519-83b8-03b164a4a241"
+        "f0ff4347-d856-4519-83b8-03b164a4a241",
+        "dafb0824-31ec-4b26-a24f-457084f61168",
+        "b446747c-5650-47b6-8eef-cefff8ac6666"
       ],
       "goals": [
         {
-          "id": "97acbe6d-1353-40b6-94bb-4b9dd89a1de5",
+          "id": "8b65b13d-03d4-423d-a71e-2bfc1166b72d",
           "title": "New goal",
-          "domain": "data-security",
+          "domain": "engineering",
           "targetDate": "2026-09-30",
           "hoursPerDay": 2,
           "performanceScore": 70,
           "status": "active"
-        },
-        {
-          "id": "199fc8fa-7eb2-43a3-96e2-4edf314a3231",
-          "title": "New goal",
-          "domain": "ai-ml",
-          "targetDate": "2026-09-30",
-          "hoursPerDay": 2,
-          "performanceScore": 70,
-          "status": "paused"
         }
       ],
       "assets": [],

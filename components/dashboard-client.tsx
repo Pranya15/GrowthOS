@@ -1,11 +1,24 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { signOut } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { isAbortLikeError, toClientErrorMessage } from "@/lib/client-errors";
-import { domainBlueprints, getBlueprint } from "@/lib/data";
+import { toClientErrorMessage } from "@/lib/client-errors";
+import { buildAdaptivePlan, buildPlanner, buildStaticResourceRecommendations, domainBlueprints, getBlueprint } from "@/lib/data";
+import {
+  createAssetInFirestore,
+  createGoalInFirestore,
+  createReminderInFirestore,
+  deleteGoalInFirestore,
+  logActivityInFirestore,
+  refreshWorkspaceUser,
+  toggleReminderInFirestore,
+  updateGoalInFirestore,
+  uploadAssetToFirebase
+} from "@/lib/firebase-user";
+import { firebaseAuth } from "@/lib/firebase";
 import { PublicUserRecord } from "@/lib/models";
 import { DomainKey } from "@/lib/types";
 
@@ -88,7 +101,7 @@ function StatCard({
   valueClassName?: string;
 }) {
   return (
-    <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-5">
+    <div className="min-w-0 w-full max-w-full overflow-hidden rounded-3xl border border-slate-200 bg-white p-5">
       <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{label}</p>
       <p className={`mt-3 min-w-0 break-words tracking-tight text-ink [overflow-wrap:anywhere] ${valueClassName}`}>{value}</p>
       <p className="mt-2 break-words text-sm leading-6 text-slate-600">{detail}</p>
@@ -176,20 +189,20 @@ function TrendBars({
         </span>
       </div>
       <div className="mt-5 flex-1 overflow-x-auto pb-1">
-        <div className="grid min-w-[16rem] grid-cols-6 items-end gap-2 sm:min-w-[18rem]">
+        <div className="flex min-w-[18rem] items-end gap-2 sm:min-w-[20rem]">
         {safeValues.map((value, index) => (
-          <div key={`${title}-${labels[index] ?? "point"}-${index}`} className="flex min-w-0 flex-col items-center gap-2">
-            <span className="w-full truncate text-center text-xs font-semibold tabular-nums text-slate-600">{value}</span>
-            <div className="flex h-24 w-full items-end rounded-2xl bg-slate-100 px-1.5 pb-1.5 sm:h-28">
+          <div key={`${title}-${labels[index] ?? "point"}-${index}`} className="flex w-12 min-w-12 flex-none flex-col items-center gap-2">
+            <span className="w-full text-center text-[11px] font-semibold tabular-nums text-slate-600">{value}</span>
+            <div className="flex h-40 w-full items-end rounded-2xl bg-slate-100 px-1.5 pb-1.5 sm:h-44">
               <div
-                className="w-full rounded-xl"
+                className="w-full rounded-lg"
                 style={{
-                  height: `${Math.max(18, (value / max) * 100)}%`,
+                  height: `${Math.max(85, (value / max) * 100)}%`,
                   background: tone
                 }}
               />
             </div>
-            <span className="w-full truncate text-center text-xs tabular-nums text-slate-500">{labels[index] ?? `D${index + 1}`}</span>
+            <span className="w-full text-center text-[11px] tabular-nums text-slate-500">{labels[index] ?? `D${index + 1}`}</span>
           </div>
         ))}
         </div>
@@ -261,7 +274,7 @@ function InsightCard({
   );
 }
 
-export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord }) {
+export function DashboardClient({ userId, initialUser }: { userId: string; initialUser: PublicUserRecord }) {
   const router = useRouter();
   const [user, setUser] = useState(initialUser);
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
@@ -328,10 +341,9 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
   );
 
   useEffect(() => {
-    const controller = new AbortController();
     const cache = insightCacheRef.current;
     if (!["roadmaps", "planner", "resources"].includes(activeTab)) {
-      return () => controller.abort();
+      return;
     }
 
     const timer = window.setTimeout(() => {
@@ -346,19 +358,7 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
               return;
             }
 
-            const response = await fetch("/api/roadmap", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify({ domain: selectedDomain, hoursPerDay, performanceScore })
-            });
-
-            if (!response.ok) {
-              setActionMessage("Could not load the latest roadmap insights.");
-              return;
-            }
-
-            const roadmapData = (await response.json()) as AdaptiveResponse;
+            const roadmapData = buildAdaptivePlan(selectedDomain, hoursPerDay, performanceScore) as AdaptiveResponse;
             cache.roadmap.set(roadmapRequestKey, roadmapData);
             startTransition(() => setAdaptivePlan(roadmapData));
             return;
@@ -374,19 +374,7 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
               return;
             }
 
-            const response = await fetch("/api/planner", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify({ domain: selectedDomain, hoursPerDay, availableDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] })
-            });
-
-            if (!response.ok) {
-              setActionMessage("Could not load the latest roadmap insights.");
-              return;
-            }
-
-            const plannerData = (await response.json()) as PlannerResponse;
+            const plannerData = buildPlanner(selectedDomain, hoursPerDay, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]) as PlannerResponse;
             cache.planner.set(plannerRequestKey, plannerData);
             startTransition(() => {
               setPlanner(plannerData);
@@ -401,25 +389,11 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
             return;
           }
 
-          const response = await fetch("/api/resources", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-            body: JSON.stringify({ domain: selectedDomain, goal: deferredGoalTitle.trim() || "Career growth" })
-          });
-
-          if (!response.ok) {
-            setActionMessage("Could not load the latest roadmap insights.");
-            return;
-          }
-
-          const resourceData = (await response.json()) as ResourceRecommendation;
+          const resourceData = buildStaticResourceRecommendations(selectedDomain, deferredGoalTitle.trim() || "Career growth") as ResourceRecommendation;
           cache.resources.set(resourceRequestKey, resourceData);
           startTransition(() => setResourcePlan(resourceData));
         } catch (error) {
-          if (!isAbortLikeError(error)) {
-            setActionMessage(toClientErrorMessage(error, "Could not load the latest roadmap insights."));
-          }
+          setActionMessage(toClientErrorMessage(error, "Could not load the latest roadmap insights."));
         } finally {
           setIsInsightsLoading(false);
         }
@@ -428,7 +402,6 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
 
     return () => {
       window.clearTimeout(timer);
-      controller.abort();
     };
   }, [activeTab, deferredGoalTitle, hoursPerDay, performanceScore, plannerRequestKey, resourceRequestKey, roadmapRequestKey, selectedDomain]);
 
@@ -436,47 +409,36 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
     setIsRefreshing(true);
     setActionMessage("");
     try {
-      const response = await fetch("/api/user", { cache: "no-store" });
-      if (!response.ok) {
+      const refreshed = await refreshWorkspaceUser(userId);
+      if (!refreshed) {
         setActionMessage("Refresh failed.");
         return;
       }
-      setUser((await response.json()) as PublicUserRecord);
+      setUser(refreshed);
       setActionMessage("Workspace refreshed.");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Refresh failed."));
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [userId]);
 
   const createGoal = useCallback(async () => {
     try {
-      const response = await fetch("/api/goals", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: goalTitle,
-          domain: selectedDomain,
-          targetDate,
-          hoursPerDay,
-          performanceScore
-        })
+      const updated = await createGoalInFirestore(userId, {
+        title: goalTitle,
+        domain: selectedDomain,
+        targetDate,
+        hoursPerDay,
+        performanceScore
       });
-
-      if (!response.ok) {
-        setActionMessage("Could not create the roadmap.");
-        return;
-      }
-
-      const updated = (await response.json()) as PublicUserRecord;
       setUser(updated);
       setSelectedGoalId(updated.activeGoalId);
       setActiveTab("roadmaps");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not create the roadmap."));
     }
-  }, [goalTitle, hoursPerDay, performanceScore, selectedDomain, targetDate]);
+  }, [goalTitle, hoursPerDay, performanceScore, selectedDomain, targetDate, userId]);
 
   const saveGoalTuning = useCallback(async () => {
     if (!selectedGoal) {
@@ -486,55 +448,35 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
     setIsSavingRoadmap(true);
     setActionMessage("");
     try {
-      const response = await fetch("/api/goals", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: selectedGoal.id,
-          title: goalTitle,
-          domain: selectedDomain,
-          targetDate,
-          performanceScore,
-          hoursPerDay,
-          status: "active"
-        })
+      const updated = await updateGoalInFirestore(userId, {
+        id: selectedGoal.id,
+        title: goalTitle,
+        domain: selectedDomain,
+        targetDate,
+        performanceScore,
+        hoursPerDay,
+        status: "active"
       });
-
-      if (response.ok) {
-        const updated = (await response.json()) as PublicUserRecord;
-        setUser(updated);
-        setSelectedGoalId(updated.activeGoalId || selectedGoal.id);
-        setActionMessage("Selected roadmap updated.");
-      } else {
-        setActionMessage("Roadmap update failed.");
-      }
+      setUser(updated);
+      setSelectedGoalId(updated.activeGoalId || selectedGoal.id);
+      setActionMessage("Selected roadmap updated.");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Roadmap update failed."));
     } finally {
       setIsSavingRoadmap(false);
     }
-  }, [goalTitle, hoursPerDay, performanceScore, selectedDomain, selectedGoal, targetDate]);
+  }, [goalTitle, hoursPerDay, performanceScore, selectedDomain, selectedGoal, targetDate, userId]);
 
   const deleteGoal = useCallback(async (id: string) => {
     try {
-      const response = await fetch("/api/goals", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id })
-      });
-
-      if (!response.ok) {
-        setActionMessage("Could not delete the roadmap.");
-        return;
-      }
-
-      const updated = (await response.json()) as PublicUserRecord;
+      const updated = await deleteGoalInFirestore(userId, id);
       setUser(updated);
       setSelectedGoalId(updated.activeGoalId || updated.goals[0]?.id || "");
+      setActionMessage("Roadmap deleted.");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not delete the roadmap."));
     }
-  }, []);
+  }, [userId]);
 
   const activateGoal = useCallback(async (id: string) => {
     const goal = user.goals.find((item) => item.id === id);
@@ -543,49 +485,28 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
     }
 
     try {
-      const response = await fetch("/api/goals", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: goal.id,
-          performanceScore: goal.performanceScore,
-          hoursPerDay: goal.hoursPerDay,
-          status: "active"
-        })
+      const updated = await updateGoalInFirestore(userId, {
+        id: goal.id,
+        performanceScore: goal.performanceScore,
+        hoursPerDay: goal.hoursPerDay,
+        status: "active"
       });
-
-      if (!response.ok) {
-        setActionMessage("Could not switch the active roadmap.");
-        return;
-      }
-
-      const updated = (await response.json()) as PublicUserRecord;
       setUser(updated);
       setSelectedGoalId(goal.id);
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not switch the active roadmap."));
     }
-  }, [user.goals]);
+  }, [user.goals, userId]);
 
   const createAsset = useCallback(async () => {
     try {
-      const response = await fetch("/api/assets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: assetTitle,
-          type: assetType,
-          link: assetUploadUrl || assetLink,
-          summary: assetSummary
-        })
+      const updated = await createAssetInFirestore(userId, {
+        title: assetTitle,
+        type: assetType,
+        link: assetUploadUrl || assetLink,
+        summary: assetSummary
       });
-
-      if (!response.ok) {
-        setUploadMessage("Could not save the asset.");
-        return;
-      }
-
-      setUser((await response.json()) as PublicUserRecord);
+      setUser(updated);
       setAssetTitle("");
       setAssetLink("");
       setAssetSummary("");
@@ -594,105 +515,65 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
     } catch (error) {
       setUploadMessage(toClientErrorMessage(error, "Could not save the asset."));
     }
-  }, [assetLink, assetSummary, assetTitle, assetType, assetUploadUrl]);
+  }, [assetLink, assetSummary, assetTitle, assetType, assetUploadUrl, userId]);
 
   const uploadAssetFile = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!response.ok) {
-        setUploadMessage("Upload failed.");
-        return;
-      }
-
-      const data = (await response.json()) as { url: string; name: string };
+      const data = await uploadAssetToFirebase(userId, file);
       setAssetUploadUrl(data.url);
       setAssetLink(data.url);
       setUploadMessage(`Uploaded ${data.name}`);
     } catch (error) {
       setUploadMessage(toClientErrorMessage(error, "Upload failed."));
     }
-  }, []);
+  }, [userId]);
 
   const createReminder = useCallback(async () => {
     try {
-      const response = await fetch("/api/reminders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: reminderText,
-          dueLabel: reminderDueLabel
-        })
-      });
-
-      if (!response.ok) {
-        setActionMessage("Could not add the reminder.");
-        return;
-      }
-
-      setUser((await response.json()) as PublicUserRecord);
+      const updated = await createReminderInFirestore(userId, reminderText, reminderDueLabel);
+      setUser(updated);
       setReminderText("");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not add the reminder."));
     }
-  }, [reminderDueLabel, reminderText]);
+  }, [reminderDueLabel, reminderText, userId]);
 
   const toggleReminder = useCallback(async (id: string, completed: boolean) => {
     try {
-      const response = await fetch("/api/reminders", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, completed })
-      });
-
-      if (!response.ok) {
-        setActionMessage("Could not update the reminder.");
-        return;
-      }
-
-      setUser((await response.json()) as PublicUserRecord);
+      const updated = await toggleReminderInFirestore(userId, id, completed);
+      setUser(updated);
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not update the reminder."));
     }
-  }, []);
+  }, [userId]);
 
   const logActivity = useCallback(async () => {
     const latest = user.activity[user.activity.length - 1];
     setIsLoggingActivity(true);
     setActionMessage("");
     try {
-      const response = await fetch("/api/activity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          consistency: Math.min(100, (latest?.consistency ?? 60) + 3),
-          productivity: Math.min(100, (latest?.productivity ?? 60) + 2),
-          completedTopics: (latest?.completedTopics ?? 0) + 1
-        })
+      const updated = await logActivityInFirestore(userId, {
+        consistency: Math.min(100, (latest?.consistency ?? 60) + 3),
+        productivity: Math.min(100, (latest?.productivity ?? 60) + 2),
+        completedTopics: (latest?.completedTopics ?? 0) + 1
       });
-
-      if (response.ok) {
-        setUser((await response.json()) as PublicUserRecord);
-        setActionMessage("Productive session logged.");
-      } else {
-        setActionMessage("Could not log the session.");
-      }
+      setUser(updated);
+      setActionMessage("Productive session logged.");
     } catch (error) {
       setActionMessage(toClientErrorMessage(error, "Could not log the session."));
     } finally {
       setIsLoggingActivity(false);
     }
-  }, [user.activity]);
+  }, [user.activity, userId]);
 
   const logout = useCallback(async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      if (firebaseAuth) {
+        await signOut(firebaseAuth);
+      }
     } finally {
       router.push("/auth");
     }
@@ -900,14 +781,15 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
                 <input type="range" min="35" max="100" step="1" value={performanceScore} onChange={(event) => setPerformanceScore(Number(event.target.value))} className="w-full accent-glow" />
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <button onClick={createGoal} className="w-full whitespace-nowrap rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white sm:w-auto">
+                <button type="button" onClick={createGoal} className="w-full whitespace-nowrap rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white sm:w-auto">
                   Add roadmap
                 </button>
-                <button onClick={saveGoalTuning} className="w-full whitespace-nowrap rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 sm:w-auto">
+                <button type="button" onClick={saveGoalTuning} className="w-full whitespace-nowrap rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 sm:w-auto">
                   {isSavingRoadmap ? "Updating roadmap..." : "Update selected roadmap"}
                 </button>
                 {selectedGoal ? (
                   <button
+                    type="button"
                     onClick={() => deleteGoal(selectedGoal.id)}
                     className="w-full whitespace-nowrap rounded-full border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-rose-700 sm:w-auto"
                   >
@@ -926,7 +808,7 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
                   }`}
                 >
                   <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <button onClick={() => setSelectedGoalId(goal.id)} className="min-w-0 flex-1 text-left">
+                    <button type="button" onClick={() => setSelectedGoalId(goal.id)} className="min-w-0 flex-1 text-left">
                       <h4 className="break-words font-semibold text-ink">{goal.title}</h4>
                       <div className="mt-3 flex min-w-0 flex-wrap gap-2 text-xs font-medium text-slate-600">
                         <span className="rounded-full bg-slate-100 px-3 py-1">{getBlueprint(goal.domain).label}</span>
@@ -937,12 +819,14 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
                     <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                       <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-600">{goal.status}</span>
                       <button
+                        type="button"
                         onClick={() => activateGoal(goal.id)}
                         className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-700"
                       >
                         Use
                       </button>
                       <button
+                        type="button"
                         onClick={() => deleteGoal(goal.id)}
                         className="rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-rose-700"
                       >
@@ -960,7 +844,7 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
             <h3 className="mt-2 text-2xl font-semibold tracking-tight text-ink">AI-adjusted plan for {blueprint.label}</h3>
             {adaptivePlan ? (
               <div className="mt-6 space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-6 grid-cols-1">
                   <StatCard
                     label="Intensity"
                     value={toTitleCase(adaptivePlan.intensity)}
@@ -1249,7 +1133,7 @@ export function DashboardClient({ initialUser }: { initialUser: PublicUserRecord
               Open full chatbot
             </Link>
           </div>
-          <LazyChatbotPanel user={user} selectedDomain={selectedDomain} onUserUpdate={setUser} compact />
+          <LazyChatbotPanel userId={userId} user={user} selectedDomain={selectedDomain} onUserUpdate={setUser} />
         </section>
       ) : null}
     </div>

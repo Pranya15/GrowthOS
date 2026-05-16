@@ -11,13 +11,15 @@ const LazyChatbotPanel = dynamic(() => import("@/components/chatbot-panel").then
 });
 
 export function ChatbotPageClient({
+  userId,
   initialUser,
   initialDomain
 }: {
+  userId: string;
   initialUser: PublicUserRecord;
   initialDomain: DomainKey;
 }) {
   const [user, setUser] = useState(initialUser);
 
-  return <LazyChatbotPanel user={user} selectedDomain={initialDomain} onUserUpdate={setUser} />;
+  return <LazyChatbotPanel userId={userId} user={user} selectedDomain={initialDomain} onUserUpdate={setUser} />;
 }
